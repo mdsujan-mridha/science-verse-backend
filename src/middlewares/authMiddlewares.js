@@ -1,5 +1,5 @@
 const admin = require("../config/firebase");
-const User = require("../models/User.model");
+const User = require("../models/UserModel");
 
 const authMiddleware = async (req, res, next) => {
   try {
