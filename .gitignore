@@ -28,7 +28,7 @@ build/
 firebase-debug.log
 .firebaserc
 firebase.json
-
+service-account.json
 # Cloudinary temp uploads
 uploads/
 temp/
