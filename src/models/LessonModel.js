@@ -2,18 +2,22 @@ const mongoose = require("mongoose");
 
 const lessonSchema = new mongoose.Schema(
   {
+    chapter: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Chapter",
+      required: true,
+    },
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
       required: true,
     },
-
     title: {
       type: String,
       required: true,
     },
 
-    videoId: {
+    youtubeUrl: {
       type: String,
       required: true, // YouTube video ID only
     },

@@ -22,7 +22,7 @@ const courseSchema = new mongoose.Schema(
 
     thumbnail: {
       type: String, // Cloudinary URL
-      required: true,
+      
     },
 
     price: {
@@ -54,7 +54,7 @@ const courseSchema = new mongoose.Schema(
 
     totalLessons: {
       type: Number,
-      default: 0,
+      default: 1,
     },
 
     isPublished: {
@@ -64,9 +64,14 @@ const courseSchema = new mongoose.Schema(
 
     studentsCount: {
       type: Number,
-      default: 0,
+      default: 1,
     },
-
+    chapters: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Chapter",
+      },
+    ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

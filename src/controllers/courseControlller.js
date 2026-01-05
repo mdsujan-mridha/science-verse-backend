@@ -1,5 +1,6 @@
 const Course = require("../models/CourseModel");
 const Lesson = require("../models/LessonModel");
+const Chapter = require("../models/ChapterModel");
 
 /**
  * @desc    Create a new course
@@ -7,6 +8,7 @@ const Lesson = require("../models/LessonModel");
  * @access  Admin
  */
 exports.createCourse = async (req, res) => {
+  // console.log("Creating course with data:", req.body);
   try {
     const {
       title,
@@ -44,6 +46,7 @@ exports.createCourse = async (req, res) => {
       data: course,
     });
   } catch (error) {
+    console.log("Error creating course:", error);
     res.status(500).json({
       success: false,
       message: "Course creation failed",
@@ -69,9 +72,8 @@ exports.togglePublishCourse = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Course ${
-        course.isPublished ? "published" : "unpublished"
-      }`,
+      message: `Course ${course.isPublished ? "published" : "unpublished"
+        }`,
     });
   } catch (error) {
     res.status(500).json({
@@ -111,31 +113,74 @@ exports.getAllCourses = async (req, res) => {
  * @access  Public
  */
 exports.getSingleCourse = async (req, res) => {
+  // console.log("Fetching course with slug:", req.params.slug);
   try {
     const course = await Course.findOne({
       slug: req.params.slug,
       isPublished: true,
-    }).populate("createdBy", "name");
-
+    })
+      .populate("createdBy", "name")
+      .lean();
+    // console.log("Found course:", course);
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
+    
+    // console.log("Fetching chapters for course ID:", course._id);
 
-    const lessons = await Lesson.find({ course: course._id })
+    const chapters = await Chapter.find({ course: course._id })
       .sort({ order: 1 })
-      .select("-videoId"); // hide videoId for non-enrolled users
+      .lean();
+
+    for (let chapter of chapters) {
+      chapter.lessons = await Lesson.find({
+        chapter: chapter._id,
+        isPreview: true,
+      })
+        .sort({ order: 1 })
+        .select("title duration isPreview");
+    }
 
     res.status(200).json({
       success: true,
       data: {
         course,
-        lessons,
+        chapters,
       },
     });
   } catch (error) {
+    // console.log("Error fetching course:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch course",
     });
   }
 };
+
+// get course details with lessons 
+exports.getCourseDetails = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    const isEnrolled = req.user?.enrolledCourses?.some(
+      id => id.toString() === courseId
+    );
+
+    const chapters = await Chapter.find({ course: courseId })
+      .sort({ order: 1 })
+      .lean();
+
+    for (let chapter of chapters) {
+      chapter.lessons = await Lesson.find(
+        isEnrolled
+          ? { chapter: chapter._id }
+          : { chapter: chapter._id, isPreview: true }
+      ).sort({ order: 1 });
+    }
+
+    res.json({ chapters });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

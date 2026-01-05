@@ -10,14 +10,12 @@ const router = express.Router();
 
 
 router.post(
-  "/:courseId",
- 
+  "/chapter/:chapterId",
   lessonCtrl.addLesson
 );
 
 router.put(
   "/reorder",
-
   lessonCtrl.reorderLessons
 );
 
