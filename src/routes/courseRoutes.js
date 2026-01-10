@@ -8,7 +8,8 @@ const {
     createCourse,
     togglePublishCourse,
     getAllCourses,
-    getSingleCourse
+    getSingleCourse,
+    getCourseDetails
 } = require("../controllers/courseControlller");
 
 const router = express.Router();
@@ -22,6 +23,7 @@ router.patch("/:id/publish", togglePublishCourse);
 
 router.get("/", getAllCourses);
 router.get("/:slug", getSingleCourse);
+router.get("/course/:slug", getCourseDetails);
 
 
 module.exports = router;

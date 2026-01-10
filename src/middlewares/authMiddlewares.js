@@ -2,6 +2,7 @@ const admin = require("../config/firebase");
 const User = require("../models/UserModel");
 
 const authMiddleware = async (req, res, next) => {
+  // console.log(req);
   try {
     const authHeader = req.headers.authorization;
 

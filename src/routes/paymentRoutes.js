@@ -9,11 +9,15 @@ const {
 const {
   paymentSuccess,
   paymentIPN,
+  paymentFail,
+  paymentCancel,
 } = require("../controllers/paymentCallbackController");
 
-router.post("/init",  initPayment);
+router.post("/init", firebaseAuth, initPayment);
 router.post("/success", paymentSuccess);
 router.post("/ipn", paymentIPN);
+router.post("/fail", paymentFail);
+router.post("/cancel", paymentCancel);
 
 
 
