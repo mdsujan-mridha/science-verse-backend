@@ -30,7 +30,8 @@ firebase-debug.log
 firebase.json
 service-account.json
 service-account.json
- service-account.json
+service-account.json
+/service-accountKey.json
 # Cloudinary temp uploads
 uploads/
 temp/

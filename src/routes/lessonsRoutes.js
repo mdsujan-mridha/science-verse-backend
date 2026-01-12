@@ -21,7 +21,7 @@ router.put(
 
 router.get(
   "/course/:courseId",
-  
+  auth,
   lessonCtrl.getLessonsByCourse
 );
 

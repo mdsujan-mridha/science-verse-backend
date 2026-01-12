@@ -23,11 +23,15 @@ const chapterRoutes = require("./routes/chapterRoutes");
 // progress routes
 const progressRoutes = require("./routes/progressRoutes");
 
+// use routes
+const authRoutes = require("./routes/authRoutes");
+
 app.use("/api/courses", courseRoutes);
 app.use("/api/lessons", lessonsRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/chapters", chapterRoutes);
 app.use("/api/progress", progressRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("🚀 Science Verse API is running");

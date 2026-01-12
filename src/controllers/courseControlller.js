@@ -125,7 +125,7 @@ exports.getSingleCourse = async (req, res) => {
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
-    
+
     // console.log("Fetching chapters for course ID:", course._id);
 
     const chapters = await Chapter.find({ course: course._id })
@@ -160,27 +160,37 @@ exports.getSingleCourse = async (req, res) => {
 // get course details with lessons 
 exports.getCourseDetails = async (req, res) => {
   try {
-    const { courseId } = req.params;
+    const { slug } = req.params;
 
+    const course = await Course.findOne({ slug });
+    if (!course) return res.status(404).json({ message: "Course not found" });
+
+    const courseId = course._id;
     const isEnrolled = req.user?.enrolledCourses?.some(
-      id => id.toString() === courseId
+      id => id.toString() === courseId.toString()
     );
 
     const chapters = await Chapter.find({ course: courseId })
       .sort({ order: 1 })
       .lean();
 
-    for (let chapter of chapters) {
-      chapter.lessons = await Lesson.find(
-        isEnrolled
-          ? { chapter: chapter._id }
-          : { chapter: chapter._id, isPreview: true }
-      ).sort({ order: 1 });
-    }
+    const lessonFilter = isEnrolled
+      ? { course: courseId }
+      : { course: courseId, isPreview: true };
 
-    res.json({ chapters });
+    const lessons = await Lesson.find(lessonFilter)
+      .sort({ order: 1 })
+      .select("title duration isPreview order youtubeUrl chapter");
+
+    const chaptersWithLessons = chapters.map(chapter => ({
+      ...chapter,
+      lessons: lessons.filter(lesson => lesson.chapter.toString() === chapter._id.toString())
+    }));
+
+    res.json({ success: true, course, chapters: chaptersWithLessons });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 

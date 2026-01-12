@@ -56,3 +56,55 @@ exports.updateProfile = async (req, res) => {
     });
   }
 };
+
+
+// get Enrolled Courses
+
+/**
+ * @desc    Get logged-in user's enrolled courses
+ * @route   GET /api/auth/enrolled-courses
+ * @access  Private
+ */
+exports.getMyEnrolledCourses = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .populate({
+        path: "enrolledCourses",
+        match: { isPublished: true },
+        select: `
+          title 
+          slug 
+          thumbnail 
+          subject 
+          level 
+          totalLessons 
+          studentsCount
+        `,
+      })
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Temporary progress mock (real progress comes later)
+    const courses = user.enrolledCourses.map(course => ({
+      ...course,
+      progress: 0,
+      completedLessons: 0,
+      nextLesson: null,
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: courses.length,
+      data: courses,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch enrolled courses",
+    });
+  }
+};
+

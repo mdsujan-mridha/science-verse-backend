@@ -23,7 +23,7 @@ router.patch("/:id/publish", togglePublishCourse);
 
 router.get("/", getAllCourses);
 router.get("/:slug", getSingleCourse);
-router.get("/course/:slug", getCourseDetails);
+router.get("/course/:slug",auth, getCourseDetails);
 
 
 module.exports = router;

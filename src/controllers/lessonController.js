@@ -50,7 +50,7 @@ exports.addLesson = async (req, res) => {
 exports.reorderLessons = async (req, res) => {
   try {
     const { chapterId, orders } = req.body;
-   
+
     const bulkOps = orders.map(item => ({
       updateOne: {
         filter: { _id: item.lessonId, chapter: chapterId },
@@ -84,8 +84,8 @@ exports.getLessonsByCourse = async (req, res) => {
 
     const lessons = await Lesson.find(filter)
       .populate("chapter", "title order")
-      .sort({ "chapter.order": 1, order: 1 });
-
+      .sort({ "chapter.order": 1, order: 1 })
+      .select("title duration isPreview order chapter youtubeUrl"); // ✅ Add the video URL
     res.json(lessons);
   } catch (error) {
     res.status(500).json({ message: error.message });
